@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Теплица</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+    <script>
+        var socket = io.connect("http://" + document.domain + ":5050");
+
+        socket.on("update_data", function(data) {
+            console.log("🔄 Обновление данных:", data);
+
+            function updateElement(id, value, unit="") {
+                let element = document.getElementById(id);
+                if (element) {
+                    element.innerText = value + unit;
+                } else {
+                    console.error(`❌ Ошибка: элемент с id="${id}" не найден.`);
+                }
+            }
+
+            updateElement("temperature", data.dhtTemperature, "°C");
+            updateElement("humidity", data.dhtHumidity, "%");
+            updateElement("soil-humidity", data.soilValue, "%");
+            updateElement("mq3", data.mq3Analog);
+            updateElement("pressure", data.pressure, " hPa");
+            updateElement("altitude", data.altitude, " м");
+            updateElement("temperature1", data.bmpTemperature, "°C");
+            updateElement("mq7", data.mq7Analog);
+            updateElement("green", data.green, "lux");
+            updateElement("extraSensorValue", data.extraSensorValue, "lux");
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h2 {
+            text-align: center;
+        }
+        .sidebar button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+        }
+        .sidebar button:hover {
+            background: #34495e;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: #1e7e34;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            position: relative;
+        }
+        .value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #333;
+        }
+        .label {
+            font-size: 18px;
+            color: #777;
+        }
+        .card.alert {
+            background: #ffdddd;
+        }
+        .card.alert .value {
+            color: red;
+        }
+        .card.warning {
+            background: #fff4c2;
+        }
+        .card.warning .value {
+            color: orange;
+        }
+        .card.critical::after {
+            background: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Меню</h2>
+        <button>Статистика</button>
+        <button>Настройки</button>
+        <button>Поддержка</button>
+    </div>
+    <div class="content">
+        <div class="tabs">
+            <div class="tab active">Информация</div>
+            <div class="tab">Изменение параметров</div>
+            <div class="tab">Ручное управление параметрами</div>
+        </div>
+        <div class="dashboard">
+            <div class="card alert">
+                <div class="value" id="temperature">0°C</div>
+                <div class="label">Температура</div>
+            </div>
+            <div class="card">
+                <div class="value" id="humidity">0%</div>
+                <div class="label">Влажность</div>
+            </div>
+            <div class="card">
+                <div class="value" id="soil-humidity">0%</div>
+                <div class="label">Влажность почвы</div>
+            </div>
+            <div class="card warning">
+                <div class="value" id="mq3">0</div>
+                <div class="label">MQ-3 (газ)</div>
+            </div>
+            <div class="card">
+                <div class="value" id="pressure">0 hPa</div>
+                <div class="label">Давление</div>
+            </div>
+            <div class="card">
+                <div class="value" id="altitude">0 м</div>
+                <div class="label">Высота</div>
+            </div>
+            <div class="card alert">
+                <div class="value" id="temperature1">0°C</div>
+                <div class="label">Температура</div>
+            </div>
+            <div class="card alert">
+                <div class="value" id="mq7">0°C</div>
+                <div class="label">CO2</div>
+            </div>
+            <div class="card alert">
+                <div class="value" id="green">0°C</div>
+                <div class="label">Зеленый</div>
+            </div>
+            <div class="card alert">
+                <div class="value" id="extraSensorValue">0°C</div>
+                <div class="label">Освещение</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
